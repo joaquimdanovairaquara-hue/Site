@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Meu Site</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 20px;
+      margin: 15px auto;
+      border-radius: 10px;
+      max-width: 400px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 5px;
+      width: 90%;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      padding: 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+    }
+
+    #dashboard {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="auth" class="box">
+  <h2>Login / Cadastro</h2>
+
+  <input id="name" placeholder="Nome"><br>
+  <input id="email" placeholder="Email"><br>
+  <input id="pass" type="password" placeholder="Senha"><br>
+
+  <button onclick="register()">Criar Conta</button>
+  <button onclick="login()">Login</button>
+
+  <p id="msg"></p>
+</div>
+
+<div id="dashboard">
+
+  <div class="box">
+    <h2 id="welcome"></h2>
+  </div>
+
+  <div class="box">
+    <h3>🎯 Quiz</h3>
+    <p id="question"></p>
+    <input id="answer">
+    <button onclick="checkQuiz()">Responder</button>
+    <p id="quizResult"></p>
+  </div>
+
+  <div class="box">
+    <h3>🎲 Sorte do dia</h3>
+    <button onclick="sorte()">Ver sorte</button>
+    <p id="sorteText"></p>
+  </div>
+
+  <div class="box">
+    <h3>🎁 Surpresa</h3>
+    <button onclick="surpresa()">Abrir</button>
+    <p id="surpresaText"></p>
+  </div>
+
+  <button onclick="logout()">Sair</button>
+
+</div>
+
+<script>
+let perguntas = [
+  {q: "5 + 5", a: "10"},
+  {q: "3 + 7", a: "10"},
+  {q: "10 - 4", a: "6"},
+  {q: "2 x 3", a: "6"},
+  {q: "8 + 2", a: "10"}
+];
+
+let atual;
+
+function novaPergunta() {
+  atual = perguntas[Math.floor(Math.random() * perguntas.length)];
+  document.getElementById("question").innerText = atual.q;
+}
+
+let currentUser = localStorage.getItem("currentUser");
+
+if (currentUser) {
+  showDashboard(currentUser);
+}
+
+function register() {
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
+
+  if (!name || !email || !pass) {
+    msg("Preencha tudo!");
+    return;
+  }
+
+  if (localStorage.getItem(email)) {
+    msg("Email já existe!");
+    return;
+  }
+
+  localStorage.setItem(email, JSON.stringify({name, pass}));
+  msg("Conta criada!");
+}
+
+function login() {
+  let email = document.getElementById("email").value;
+  let pass = document.getElementById("pass").value;
+
+  let data = localStorage.getItem(email);
+
+  if (!data) {
+    msg("Conta não existe!");
+    return;
+  }
+
+  let user = JSON.parse(data);
+
+  if (user.pass === pass) {
+    localStorage.setItem("currentUser", email);
+    showDashboard(email);
+  } else {
+    msg("Senha errada!");
+  }
+}
+
+function showDashboard(email) {
+  let user = JSON.parse(localStorage.getItem(email));
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("welcome").innerText = "Bem-vindo, " + user.name + "!!!";
+  novaPergunta();
+}
+
+function checkQuiz() {
+  let answer = document.getElementById("answer").value;
+
+  if (answer == atual.a) {
+    document.getElementById("quizResult").innerText = "Acertou 😎";
+  } else {
+    document.getElementById("quizResult").innerText = "Errou 😢";
+  }
+
+  novaPergunta();
+}
+
+function sorte() {
+  let frases = [
+    "Hoje vai ser um dia top 😎",
+    "Cuidado com decisões hoje ⚠️",
+    "Você vai ter sorte 🍀",
+    "Algo bom vai acontecer 🎉",
+    "Fica tranquilo hoje 😌",
+    "Boa notícia vindo aí 👀",
+    "Dia perfeito pra tentar algo novo 🚀"
+  ];
+
+  let s = frases[Math.floor(Math.random() * frases.length)];
+  document.getElementById("sorteText").innerText = s;
+}
+
+function surpresa() {
+  let coisas = [
+    "🔥 Você é incrível",
+    "🎉 Algo grande vem aí",
+    "😎 Continua assim",
+    "💪 Você consegue tudo",
+    "🚀 Nunca desista",
+    "👀 Algo inesperado vem aí",
+    "🎯 Foque nos seus objetivos"
+  ];
+
+  let s = coisas[Math.floor(Math.random() * coisas.length)];
+  document.getElementById("surpresaText").innerText = s;
+}
+
+function logout() {
+  localStorage.removeItem("currentUser");
+  location.reload();
+}
+
+function msg(text) {
+  document.getElementById("msg").innerText = text;
+}
+</script>
+
+</body>
+</html>
